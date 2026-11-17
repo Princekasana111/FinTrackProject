@@ -9,7 +9,7 @@ A full-stack personal finance dashboard for tracking income and expenses, organi
 ## Features
 
 - **Accounts and login.** Register and log in with JWT authentication. Passwords are hashed with BCrypt.
-- **Transactions.** Add, edit and delete income and expense entries, each with an amount, date, category and note.
+- **Transactions.** Add and delete income and expense entries, each with an amount, date, category and note. Editing a transaction is supported by the API (`PUT /api/transactions/{id}`) but not yet in the UI.
 - **Categories.** Create your own spending categories from the Transactions page.
 - **Dashboard.** Total income, total expenses and balance, plus a monthly income-vs-expense bar chart.
 - **Analytics.** A pie chart of spending by category and a line chart of the monthly trend.
@@ -220,6 +220,7 @@ curl -X POST http://localhost:8080/api/auth/login \
 ## Possible improvements
 
 - A budgets screen in the UI that compares spending against each budget.
+- Edit buttons for transactions and a delete button for categories in the UI (the API already supports both).
 - Admin-only endpoints that use the existing `ADMIN` role. Right now every logged-in user has the same permissions.
 - More tests, especially for the services and controllers.
 - Filtering and searching transactions by date range or category.
