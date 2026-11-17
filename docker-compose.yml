@@ -1,0 +1,49 @@
+# ---------------------------------------------------------------------------
+# Runs the WHOLE app with one command:  docker compose up --build
+#
+#   db       -> MySQL 8 database
+#   backend  -> Spring Boot API (waits for db to be healthy)
+#   frontend -> React app served by nginx, proxies /api to the backend
+#
+# Open http://localhost:3000 in your browser.
+# ---------------------------------------------------------------------------
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_DATABASE: fintrack
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - db_data:/var/lib/mysql
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      # These env vars override the H2 defaults in application.properties,
+      # pointing Spring Boot at the MySQL container instead.
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/fintrack?allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  db_data:
